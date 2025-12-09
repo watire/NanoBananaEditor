@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { generateImageContent } from '../services/geminiService';
-import { ImageFile, GeneratedImage } from '../types';
-import { Upload, X, Wand2, Download, Image as ImageIcon, Sparkles, RefreshCw, AlertCircle, History, Trash2 } from 'lucide-react';
+import { ImageFile, GeneratedImage, AspectRatio } from '../types';
+import { Upload, X, Wand2, Download, Image as ImageIcon, Sparkles, RefreshCw, AlertCircle, History, Trash2, BoxSelect } from 'lucide-react';
 
 const EXAMPLE_PROMPTS = [
   "Add a retro filter",
@@ -20,6 +20,7 @@ export const Editor: React.FC = () => {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>("1:1");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // History State
@@ -97,6 +98,7 @@ export const Editor: React.FC = () => {
         prompt: prompt.trim(),
         base64Image: sourceImage?.base64,
         mimeType: sourceImage?.mimeType,
+        aspectRatio: aspectRatio,
       });
       
       setGeneratedImage(result);
@@ -215,6 +217,29 @@ export const Editor: React.FC = () => {
             placeholder={sourceImage ? "Describe how to edit the image (e.g., 'Add a red hat', 'Make it sketchy')" : "Describe the image you want to generate..."}
             className="w-full h-32 p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-transparent outline-none resize-none text-slate-700 placeholder-slate-400 transition-all text-sm"
           />
+
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                 <BoxSelect size={14} /> Aspect Ratio
+              </span>
+            </div>
+            <div className="grid grid-cols-5 gap-2">
+              {(["1:1", "3:4", "4:3", "9:16", "16:9"] as AspectRatio[]).map((ratio) => (
+                <button
+                  key={ratio}
+                  onClick={() => setAspectRatio(ratio)}
+                  className={`text-xs py-2 rounded-lg transition-all border font-medium
+                    ${aspectRatio === ratio
+                      ? 'bg-yellow-100 border-yellow-400 text-yellow-800 shadow-sm' 
+                      : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                    }`}
+                >
+                  {ratio}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="mt-4">
              <div className="flex items-center justify-between mb-2">
